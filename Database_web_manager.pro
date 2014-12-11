@@ -13,8 +13,11 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    dialogdatabasemanager.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    dialogdatabasemanager.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    dialogdatabasemanager.ui

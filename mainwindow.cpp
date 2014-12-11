@@ -12,3 +12,9 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+void MainWindow::on_actionDatabase_manager_triggered()
+{
+    mDialogDatabaseManager = new DialogDatabaseManager(0);
+    mDialogDatabaseManager->show();
+}
