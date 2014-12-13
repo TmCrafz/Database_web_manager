@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui
+QT       += xml
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -12,12 +13,14 @@ TARGET = Database_web_manager
 TEMPLATE = app
 
 
-SOURCES += main.cpp\
+SOURCES += main.cpp\        
         mainwindow.cpp \
-    dialogdatabasemanager.cpp
+    dialogdatabasemanager.cpp \
+    xmlhandler.cpp
 
 HEADERS  += mainwindow.h \
-    dialogdatabasemanager.h
+    dialogdatabasemanager.h \
+    xmlhandler.h
 
 FORMS    += mainwindow.ui \
     dialogdatabasemanager.ui

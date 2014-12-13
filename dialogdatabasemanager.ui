@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>290</x>
@@ -42,7 +42,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>2</x>
@@ -96,7 +96,7 @@
      </layout>
     </item>
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout_5">
+     <layout class="QVBoxLayout" name="verticalLayouAllInputs">
       <item>
        <layout class="QFormLayout" name="formLayoutData">
         <property name="fieldGrowthPolicy">
@@ -145,7 +145,7 @@
        </layout>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout">
+       <layout class="QVBoxLayout" name="verticalLayoutComment">
         <item>
          <widget class="QLabel" name="labelComment">
           <property name="text">
@@ -162,24 +162,6 @@
     </item>
    </layout>
   </widget>
-  <zorder>buttonBox</zorder>
-  <zorder>pushBtnConnect</zorder>
-  <zorder>treeWidgetDatabases</zorder>
-  <zorder>pushBtnNewDb</zorder>
-  <zorder>pushBtnDeleteDb</zorder>
-  <zorder>buttonBox</zorder>
-  <zorder>labelHostName</zorder>
-  <zorder>lineEdHostName</zorder>
-  <zorder>labelDbName</zorder>
-  <zorder>lineEdDbName</zorder>
-  <zorder>labelUserName</zorder>
-  <zorder>lineEdUserName</zorder>
-  <zorder>labelPassword</zorder>
-  <zorder>lineEdPassword</zorder>
-  <zorder>labelComment</zorder>
-  <zorder>textEdComment</zorder>
-  <zorder></zorder>
-  <zorder>label</zorder>
  </widget>
  <resources/>
  <connections>
