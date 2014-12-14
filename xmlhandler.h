@@ -29,13 +29,11 @@ public:
 
     bool createXmlFile();
 
-    void saveDbs(QList<Database> &dbList);
-
-    //bool saveDbChildIntoXml(/*int id, */QString dbName, QString hostName, QString userName, QString comment);
+    void saveAllDbs(QList<Database> &dbList);
     QList<Database> getAllDbs();
     QList<QString> getAllDbNames();
     QString loadQStringAttribute(const QString InternDbName, const QString Attr);
-    //void deleteDbElementByInternalName(const QString InternalDbName);
+
 };
 
 #endif // XMLHANDLER_H

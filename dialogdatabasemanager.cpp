@@ -11,6 +11,16 @@ DialogDatabaseManager::DialogDatabaseManager(QWidget *parent) :
     ui->treeWidgetDatabases->header()->close();
 
     ui->lineEdPassword->setEchoMode(QLineEdit::Password);
+    databasesList = xmlHandler.getAllDbs();
+    Database::cntID = 0;
+    for (Database &database: databasesList)
+    {
+        database.setID(Database::cntID++);
+        for (Database database2: databasesList)
+            qDebug() << database2.getID();
+        addRootChildFromLoaded(database);
+    }
+
 
 }
 
@@ -31,6 +41,16 @@ void DialogDatabaseManager::addRootChild()
     root->addChild(childItem);
 }
 
+void DialogDatabaseManager::addRootChildFromLoaded(Database &database)
+{
+    QTreeWidgetItem *root = ui->treeWidgetDatabases->topLevelItem(0);
+    QTreeWidgetItem *childItem = new QTreeWidgetItem;
+    childItem->setText(0, database.getInternalDbName());
+    childItem->setData(0, Qt::UserRole, database.getID());
+    root->addChild(childItem);
+}
+
+
 
 void DialogDatabaseManager::on_pushBtnNewDb_clicked()
 {
@@ -41,14 +61,22 @@ void DialogDatabaseManager::on_pushBtnDeleteDb_clicked()
 {
     QTreeWidgetItem *currentItem = ui->treeWidgetDatabases->currentItem();
     int crnItemID = currentItem->data(0, Qt::UserRole).toInt();
-    databasesList.removeAt(getDbPositionInDbList(crnItemID));
+    // First delete the item and after that remove the database from the database,
+    // because else there is an out of range error.
+    // Because the after deleting the current item the treewidget select another item and
+    // call currentItemChanged. In the slot the function want to load the data from the previous item
+    // and search for the item id in the databseslist. But the there is no match an getDbPositionInDbList() returns -1
+    // and this result in an error.
     delete currentItem;
+    databasesList.removeAt(getDbPositionInDbList(crnItemID));
+
 }
 
 void DialogDatabaseManager::on_treeWidgetDatabases_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous)
 {
+    qDebug() << "current item changed";
     // Save the data in the fields in the database class if the previous item is not 0
-    if (previous)
+    if (previous && previous != ui->treeWidgetDatabases->topLevelItem(0))
     {
         int prevItemID = previous->data(0, Qt::UserRole).toInt();
         Database &prevDatabase = databasesList[getDbPositionInDbList(prevItemID)];
@@ -79,8 +107,6 @@ void DialogDatabaseManager::on_treeWidgetDatabases_currentItemChanged(QTreeWidge
         ui->lineEdPassword->setText(crnPassword);
         ui->textEdComment->setText(crnComment);
     }
-
-
 }
 
 int DialogDatabaseManager::getDbPositionInDbList(int currentItemID){
@@ -91,4 +117,9 @@ int DialogDatabaseManager::getDbPositionInDbList(int currentItemID){
             return i;
     }
     return -1;
+}
+
+void DialogDatabaseManager::on_buttonBox_accepted()
+{
+    xmlHandler.saveAllDbs(databasesList);
 }

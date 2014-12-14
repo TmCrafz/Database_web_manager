@@ -38,35 +38,28 @@ bool XmlHandler::createXmlFile()
     return true;
 }
 
-void XmlHandler::saveDbs(QList<Database> &dbList)
+void XmlHandler::saveAllDbs(QList<Database> &dbList)
 {    
-    QFile file(FILENAME);
-    //Try to open file, if there is no file then try to create it.
+    QFile file(FILENAME);    
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))    
         qDebug() << "Unable to open " + FILENAME;
-
 
     QDomDocument document;
     QDomProcessingInstruction declaration = document.createProcessingInstruction("xml", "version=\"1.0\" encoding=\"UTF-8\"");
     document.insertBefore(declaration, QDomNode());
     QDomElement rootElement = document.createElement(ROOTELEMENT);
-    document.appendChild(rootElement);
-    qDebug() << "Before foreach in Save";
+    document.appendChild(rootElement);   
     for (Database db : dbList)
     {
-        qDebug() << "Before create element";
-        QDomElement dbElement = document.createElement(DBELEMENT);       
-        qDebug() << "After create Element";
-        dbElement.setAttribute(INTERNALDBNAMEATTR, db.getComment());
-        qDebug() << "After save firstEle";
+        qDebug() << "loop: " << db.getInternalDbName();
+        QDomElement dbElement = document.createElement(DBELEMENT);
+        dbElement.setAttribute(INTERNALDBNAMEATTR, db.getInternalDbName());
         dbElement.setAttribute(DBNAMEATTR, db.getDbName());
         dbElement.setAttribute(HOSTNAMEATTR, db.getHostName());
         dbElement.setAttribute(USERNAMEATTR, db.getUserName());
         dbElement.setAttribute(COMMENTATTR, db.getComment());
         rootElement.appendChild(dbElement);
     }
-    qDebug() << "After foreach in Save";
-
     QTextStream stream(&file);
     stream.setCodec("UTF-8");
     stream << document.toString();

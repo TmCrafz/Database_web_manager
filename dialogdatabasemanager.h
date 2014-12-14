@@ -19,6 +19,7 @@ public:
     ~DialogDatabaseManager();
 
     void addRootChild();
+    void addRootChildFromLoaded(Database &database);
     int getDbPositionInDbList(int crnItemID);
 
 signals:
@@ -31,6 +32,8 @@ private slots:
     void on_pushBtnDeleteDb_clicked();
 
     void on_treeWidgetDatabases_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
+
+    void on_buttonBox_accepted();
 
 private:
     int dbCnt = 0;
