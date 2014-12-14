@@ -51,7 +51,6 @@ void XmlHandler::saveAllDbs(QList<Database> &dbList)
     document.appendChild(rootElement);   
     for (Database db : dbList)
     {
-        qDebug() << "loop: " << db.getInternalDbName();
         QDomElement dbElement = document.createElement(DBELEMENT);
         dbElement.setAttribute(INTERNALDBNAMEATTR, db.getInternalDbName());
         dbElement.setAttribute(DBNAMEATTR, db.getDbName());
@@ -158,13 +157,11 @@ QString XmlHandler::loadQStringAttribute(const QString InternDbName, const QStri
         if (!xmlDocument.setContent(&xmlFile))
             return loadedAttr;
         xmlFile.close();
-    }
-    qDebug() << "after xmlDoc";
+    }    
     QDomElement root = xmlDocument.firstChildElement();
     QDomNodeList rootNodeList = root.elementsByTagName(DBELEMENT);
     for (unsigned i = 0; i != rootNodeList.count(); ++i)
-    {
-        qDebug() << "loop loadQSting";
+    {        
         QDomNode databaseNode = rootNodeList.at(i);
         if (databaseNode.isElement())
         {

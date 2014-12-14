@@ -11,17 +11,16 @@ DialogDatabaseManager::DialogDatabaseManager(QWidget *parent) :
     ui->treeWidgetDatabases->header()->close();
 
     ui->lineEdPassword->setEchoMode(QLineEdit::Password);
+
+    setInputFieldsEnabled(false);
+
     databasesList = xmlHandler.getAllDbs();
     Database::cntID = 0;
     for (Database &database: databasesList)
     {
         database.setID(Database::cntID++);
-        for (Database database2: databasesList)
-            qDebug() << database2.getID();
         addRootChildFromLoaded(database);
     }
-
-
 }
 
 DialogDatabaseManager::~DialogDatabaseManager()
@@ -48,6 +47,7 @@ void DialogDatabaseManager::addRootChildFromLoaded(Database &database)
     childItem->setText(0, database.getInternalDbName());
     childItem->setData(0, Qt::UserRole, database.getID());
     root->addChild(childItem);
+    childItem->setFlags(childItem->flags() | Qt::ItemIsEditable);
 }
 
 void DialogDatabaseManager::setInputFieldsEnabled(bool status)
@@ -65,6 +65,16 @@ void DialogDatabaseManager::clearInputFields()
     ui->lineEdUserName->setText("");
     ui->lineEdPassword->setText("");
     ui->textEdComment->setText("");
+}
+
+bool DialogDatabaseManager::matchesTextWithDatabasesListInternalName(const QString text, int crnID)
+{
+    for (Database database: databasesList)
+    {
+        if (text == database.getInternalDbName() && crnID != database.getID())
+            return true;
+    }
+    return false;
 }
 
 void DialogDatabaseManager::on_pushBtnNewDb_clicked()
@@ -85,6 +95,28 @@ void DialogDatabaseManager::on_pushBtnDeleteDb_clicked()
     delete currentItem;
     databasesList.removeAt(getDbPositionInDbList(crnItemID));
 
+}
+
+void DialogDatabaseManager::on_pushBtnConnect_clicked()
+{
+    //Save actual data in the input field in the database class object
+    QTreeWidgetItem *item = ui->treeWidgetDatabases->currentItem();
+
+    int crnItemID = item->data(0, Qt::UserRole).toInt();
+    Database &database = databasesList[getDbPositionInDbList(crnItemID)];
+    QString dbName = ui->lineEdDbName->text();
+    QString hostName = ui->lineEdHostName->text();
+    QString userName = ui->lineEdUserName->text();
+    QString password = ui->lineEdPassword->text();
+    QString comment = ui->textEdComment->toPlainText();
+    database.setDbName(dbName);
+    database.setHostName(hostName);
+    database.setUserName(userName);
+    database.setPasswort(password);
+    database.setComment(comment);
+
+    xmlHandler.saveAllDbs(databasesList);
+    emit connectToDB(database);
 }
 
 void DialogDatabaseManager::on_treeWidgetDatabases_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous)
@@ -143,5 +175,40 @@ int DialogDatabaseManager::getDbPositionInDbList(int currentItemID){
 
 void DialogDatabaseManager::on_buttonBox_accepted()
 {
+    //Save actual data in the input field in the database class object
+    QTreeWidgetItem *item = ui->treeWidgetDatabases->currentItem();
+
+    int crnItemID = item->data(0, Qt::UserRole).toInt();
+    Database &database = databasesList[getDbPositionInDbList(crnItemID)];
+    QString dbName = ui->lineEdDbName->text();
+    QString hostName = ui->lineEdHostName->text();
+    QString userName = ui->lineEdUserName->text();
+    QString password = ui->lineEdPassword->text();
+    QString comment = ui->textEdComment->toPlainText();
+    database.setDbName(dbName);
+    database.setHostName(hostName);
+    database.setUserName(userName);
+    database.setPasswort(password);
+    database.setComment(comment);
+
     xmlHandler.saveAllDbs(databasesList);
 }
+
+
+
+void DialogDatabaseManager::on_treeWidgetDatabases_itemChanged(QTreeWidgetItem *item, int column)
+{
+    //If the new InternalDbName is already taken, then let the user set a new one.
+    QString itemText = item->text(column);
+    int crnID = item->data(0, Qt::UserRole).toInt();
+    if (matchesTextWithDatabasesListInternalName(itemText, crnID))
+    {
+        qDebug() << "matches";
+        //item->setFlags(item->flags() | Qt::ItemIsEditable);
+        //ui->treeWidgetDatabases->setCurrentItem(item);
+        //ui->treeWidgetDatabases->editItem(item, column);
+    }
+    qDebug() << "item changed";
+}
+
+

@@ -22,10 +22,11 @@ public:
     void addRootChildFromLoaded(Database &database);
     void setInputFieldsEnabled(bool status);
     void clearInputFields();
+    bool matchesTextWithDatabasesListInternalName(const QString text, int crnID);
     int getDbPositionInDbList(int crnItemID);
 
 signals:
-    void connectToDB(QString internalDbName);    
+    void connectToDB(Database &database);
 private slots:
 
 
@@ -36,6 +37,11 @@ private slots:
     void on_treeWidgetDatabases_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
 
     void on_buttonBox_accepted();
+
+
+    void on_treeWidgetDatabases_itemChanged(QTreeWidgetItem *item, int column);
+
+    void on_pushBtnConnect_clicked();
 
 private:
     int dbCnt = 0;
