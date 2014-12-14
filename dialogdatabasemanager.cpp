@@ -50,7 +50,22 @@ void DialogDatabaseManager::addRootChildFromLoaded(Database &database)
     root->addChild(childItem);
 }
 
+void DialogDatabaseManager::setInputFieldsEnabled(bool status)
+{
+    for(int i = 0; i < ui->formLayoutData->count(); i++)
+        ui->formLayoutData->itemAt(i)->widget()->setEnabled(status);
+    for (int i = 0; i < ui->verticalLayoutComment->count(); i++)
+        ui->verticalLayoutComment->itemAt(i)->widget()->setEnabled(status);
+}
 
+void DialogDatabaseManager::clearInputFields()
+{
+    ui->lineEdDbName->setText("");
+    ui->lineEdHostName->setText("");
+    ui->lineEdUserName->setText("");
+    ui->lineEdPassword->setText("");
+    ui->textEdComment->setText("");
+}
 
 void DialogDatabaseManager::on_pushBtnNewDb_clicked()
 {
@@ -91,9 +106,11 @@ void DialogDatabaseManager::on_treeWidgetDatabases_currentItemChanged(QTreeWidge
         prevDatabase.setPasswort(prevPassword);
         prevDatabase.setComment(prevComment);
     }
-    // Show the data from the current database if its the top level item
+    // Show the data from the current database if its not the top level item
+    // If it is the top level item clear the input fiels and make then not useable
     if (current != ui->treeWidgetDatabases->topLevelItem(0))
     {
+        setInputFieldsEnabled(true);
         int crnItemID = current->data(0, Qt::UserRole).toInt();
         Database &crnDatabase = databasesList[getDbPositionInDbList(crnItemID)];
         QString crnDbName = crnDatabase.getDbName();
@@ -106,6 +123,11 @@ void DialogDatabaseManager::on_treeWidgetDatabases_currentItemChanged(QTreeWidge
         ui->lineEdUserName->setText(crnUserName);
         ui->lineEdPassword->setText(crnPassword);
         ui->textEdComment->setText(crnComment);
+    }
+    else
+    {
+        clearInputFields();
+        setInputFieldsEnabled(false);
     }
 }
 

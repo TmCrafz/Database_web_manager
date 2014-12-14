@@ -20,6 +20,8 @@ public:
 
     void addRootChild();
     void addRootChildFromLoaded(Database &database);
+    void setInputFieldsEnabled(bool status);
+    void clearInputFields();
     int getDbPositionInDbList(int crnItemID);
 
 signals:
