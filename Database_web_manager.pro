@@ -16,11 +16,13 @@ TEMPLATE = app
 SOURCES += main.cpp\        
         mainwindow.cpp \
     dialogdatabasemanager.cpp \
-    xmlhandler.cpp
+    xmlhandler.cpp \
+    database.cpp
 
 HEADERS  += mainwindow.h \
     dialogdatabasemanager.h \
-    xmlhandler.h
+    xmlhandler.h \
+    database.h
 
 FORMS    += mainwindow.ui \
     dialogdatabasemanager.ui

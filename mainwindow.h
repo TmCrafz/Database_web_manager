@@ -18,6 +18,7 @@ public:
 
 private slots:
     void on_actionDatabase_manager_triggered();
+    void connectWithDb(QString internalDbName);
 
 private:
     Ui::MainWindow *ui;

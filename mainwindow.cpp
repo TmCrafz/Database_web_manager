@@ -6,6 +6,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+
 }
 
 MainWindow::~MainWindow()
@@ -16,5 +18,12 @@ MainWindow::~MainWindow()
 void MainWindow::on_actionDatabase_manager_triggered()
 {
     mDialogDatabaseManager = new DialogDatabaseManager(0);
+    connect(mDialogDatabaseManager, SIGNAL(connectToDB(QString)), this, SLOT(connectWithDb(QString)));
     mDialogDatabaseManager->show();
+}
+
+void MainWindow::connectWithDb(QString internalDbName)
+{
+    qDebug() << "Connect to db: " + internalDbName;
+
 }

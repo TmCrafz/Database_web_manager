@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QTreeWidget>
+#include <QString>
 #include "xmlhandler.h"
 
 namespace Ui {
@@ -17,18 +18,26 @@ public:
     explicit DialogDatabaseManager(QWidget *parent = 0);
     ~DialogDatabaseManager();
 
-    void teeWidgetStartSelection();
-    void addChildToTree(QTreeWidgetItem *parent, QString name);
+    void addRootChild();
+    int getDbPositionInDbList(int crnItemID);
 
-
+signals:
+    void connectToDB(QString internalDbName);    
 private slots:
+
+
     void on_pushBtnNewDb_clicked();
 
-    void on_treeWidgetDatabases_itemSelectionChanged();
+    void on_pushBtnDeleteDb_clicked();
+
+    void on_treeWidgetDatabases_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
 
 private:
+    int dbCnt = 0;
+
     Ui::DialogDatabaseManager *ui;
     XmlHandler xmlHandler;
+    QList<Database> databasesList;
 };
 
 #endif // DIALOGDATABASEMANAGER_H

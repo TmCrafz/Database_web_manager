@@ -1,17 +1,20 @@
 #include "xmlhandler.h"
 
+const QString XmlHandler::INTERNALDBNAMEATTR = "internalDbName";
+const QString XmlHandler::DBNAMEATTR = "dbName";
+const QString XmlHandler::HOSTNAMEATTR = "hostName";
+const QString XmlHandler::USERNAMEATTR = "userName";
+const QString XmlHandler::COMMENTATTR = "comment";
 
 XmlHandler::XmlHandler():
     FILENAME("databases.xml"),
     ROOTELEMENT("databases"),
-    DBELEMENT("database"),
-    IDATTR("id"),
-    DBNAMEATTR("dbName"),
-    HOSTNAMEATTR("hostName"),
-    USERNAMEATTR("userName"),
-    COMMENTATTR("comment")
+    DBELEMENT("database")
+    //IDATTR("id")
 {
 }
+
+
 
 bool XmlHandler::createXmlFile()
 {
@@ -35,45 +38,82 @@ bool XmlHandler::createXmlFile()
     return true;
 }
 
-bool XmlHandler::saveDbChildIntoXml(int id, QString dbName, QString hostName, QString userName, QString comment)
-{
-    QDomDocument xmlDocument;
+void XmlHandler::saveDbs(QList<Database> &dbList)
+{    
     QFile file(FILENAME);
     //Try to open file, if there is no file then try to create it.
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-           qDebug() << "Unable to open " + FILENAME;
-           if (!createXmlFile())
-               return false;
-           if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-           {
-                qDebug() << "Unable to create file: " + FILENAME;
-                return false;
-           }
-    }
-    if (!xmlDocument.setContent(&file))
-    {
-        qDebug() << "Unable to load xml document";
-        return false;
-    }
-    file.close();
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))    
+        qDebug() << "Unable to open " + FILENAME;
 
-    QDomElement rootElement = xmlDocument.firstChildElement();
-    QDomElement databaseElement = xmlDocument.createElement(DBELEMENT);
-    databaseElement.setAttribute(IDATTR, id);
-    databaseElement.setAttribute(DBNAMEATTR, dbName);
-    databaseElement.setAttribute(HOSTNAMEATTR, hostName);
-    databaseElement.setAttribute(USERNAMEATTR, userName);
-    databaseElement.setAttribute(COMMENTATTR, comment);
-    rootElement.appendChild(databaseElement);
+
+    QDomDocument document;
+    QDomProcessingInstruction declaration = document.createProcessingInstruction("xml", "version=\"1.0\" encoding=\"UTF-8\"");
+    document.insertBefore(declaration, QDomNode());
+    QDomElement rootElement = document.createElement(ROOTELEMENT);
+    document.appendChild(rootElement);
+    qDebug() << "Before foreach in Save";
+    for (Database db : dbList)
+    {
+        qDebug() << "Before create element";
+        QDomElement dbElement = document.createElement(DBELEMENT);       
+        qDebug() << "After create Element";
+        dbElement.setAttribute(INTERNALDBNAMEATTR, db.getComment());
+        qDebug() << "After save firstEle";
+        dbElement.setAttribute(DBNAMEATTR, db.getDbName());
+        dbElement.setAttribute(HOSTNAMEATTR, db.getHostName());
+        dbElement.setAttribute(USERNAMEATTR, db.getUserName());
+        dbElement.setAttribute(COMMENTATTR, db.getComment());
+        rootElement.appendChild(dbElement);
+    }
+    qDebug() << "After foreach in Save";
 
     QTextStream stream(&file);
     stream.setCodec("UTF-8");
-    stream << xmlDocument.toString();
+    stream << document.toString();
     file.flush();
     file.close();
-    return true;
 }
+
+QList<Database> XmlHandler::getAllDbs()
+{
+    QList<Database> databasesList;
+    QDomDocument document;
+    QFile file(FILENAME);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        qDebug() << "Unable to open file";
+        return databasesList;
+    }
+    else
+    {
+        if (!document.setContent(&file))
+        {
+            file.close();
+            return databasesList;
+        }
+        file.close();
+    }
+    QDomElement root = document.firstChildElement();
+    QDomNodeList rootNodeList = root.elementsByTagName(DBELEMENT);
+    for (unsigned i = 0; i != rootNodeList.count(); ++i)
+    {
+        QDomNode databaseNode = rootNodeList.at(i);
+        if (databaseNode.isElement())
+        {
+            QDomElement databaseElement = databaseNode.toElement();
+            QString internalDbName = databaseElement.attribute(INTERNALDBNAMEATTR);
+            QString dbName = databaseElement.attribute(DBNAMEATTR);
+            QString hostName = databaseElement.attribute(HOSTNAMEATTR);
+            QString userName = databaseElement.attribute(USERNAMEATTR);
+            QString comment = databaseElement.attribute(COMMENTATTR);
+            Database database(Database::cntID++, internalDbName, dbName, hostName, userName, "", comment);
+            databasesList.append(database);
+        }
+    }
+    file.close();
+    return databasesList;
+}
+
 
 QList<QString> XmlHandler::getAllDbNames()
 {
@@ -89,24 +129,59 @@ QList<QString> XmlHandler::getAllDbNames()
     {
         if (!xmlDocument.setContent(&xmlFile))
         {
-            qDebug() << "Unable to load xml document";
+            xmlFile.close();
             return databasesNameList;
         }
         xmlFile.close();
     }
     QDomElement root = xmlDocument.firstChildElement();
-    QDomNodeList rootNodeList = root.elementsByTagName(ROOTELEMENT);
-    for (unsigned i {0}; i != rootNodeList.count(); ++i)
-    {
+    QDomNodeList rootNodeList = root.elementsByTagName(DBELEMENT);
+    for (unsigned i = 0; i != rootNodeList.count(); ++i)
+    {        
         QDomNode databaseNode = rootNodeList.at(i);
         if (databaseNode.isElement())
         {
             QDomElement databaseElement = databaseNode.toElement();
-            QString databaseName = databaseElement.attribute(DBNAMEATTR);
-            databasesNameList.append(databaseName);
+            QString databaseName = databaseElement.attribute(INTERNALDBNAMEATTR);
+            databasesNameList.append(databaseName);            
+        }
+    }   
+    xmlFile.close();
+    return databasesNameList;
+}
+
+QString XmlHandler::loadQStringAttribute(const QString InternDbName, const QString ATTR)
+{
+    QString loadedAttr;
+    QDomDocument xmlDocument;
+    QFile xmlFile(FILENAME);
+    if (!xmlFile.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        qDebug() << "Unable to open file";
+        return loadedAttr;
+    }
+    else
+    {
+        if (!xmlDocument.setContent(&xmlFile))
+            return loadedAttr;
+        xmlFile.close();
+    }
+    qDebug() << "after xmlDoc";
+    QDomElement root = xmlDocument.firstChildElement();
+    QDomNodeList rootNodeList = root.elementsByTagName(DBELEMENT);
+    for (unsigned i = 0; i != rootNodeList.count(); ++i)
+    {
+        qDebug() << "loop loadQSting";
+        QDomNode databaseNode = rootNodeList.at(i);
+        if (databaseNode.isElement())
+        {
+            QDomElement databaseElement = databaseNode.toElement();
+            if (databaseElement.attribute(INTERNALDBNAMEATTR) == InternDbName)
+                loadedAttr = databaseElement.attribute(ATTR);
         }
     }
-    return databasesNameList;
+    xmlFile.close();
+    return loadedAttr;
 }
 
 

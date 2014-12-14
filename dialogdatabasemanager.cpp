@@ -1,3 +1,4 @@
+#include <QMessageBox>
 #include "dialogdatabasemanager.h"
 #include "ui_dialogdatabasemanager.h"
 
@@ -11,9 +12,6 @@ DialogDatabaseManager::DialogDatabaseManager(QWidget *parent) :
 
     ui->lineEdPassword->setEchoMode(QLineEdit::Password);
 
-    //teeWidgetStartSelection();
-
-
 }
 
 DialogDatabaseManager::~DialogDatabaseManager()
@@ -21,79 +19,76 @@ DialogDatabaseManager::~DialogDatabaseManager()
     delete ui;
 }
 
-void DialogDatabaseManager::teeWidgetStartSelection()
+void DialogDatabaseManager::addRootChild()
 {
-    qDebug() << "startselection  ";
-    for(int i = 0; i < ui->formLayoutData->count(); i++)
-        ui->formLayoutData->itemAt(i)->widget()->setEnabled(false);
-    for (int i = 0; i < ui->verticalLayoutComment->count(); i++)
-        ui->verticalLayoutComment->itemAt(i)->widget()->setEnabled(false);
-    QTreeWidgetItem *root = new QTreeWidgetItem(ui->treeWidgetDatabases->itemAt(0, 0));
-    QList<QString> databaseNames = xmlHandler.getAllDbNames();
-    QList<QTreeWidgetItem *>items;
-    qDebug() << "databasenames size " << databaseNames.size();
-    for (QString name : databaseNames)
-        root->setText(0, name);
-
-
-    /*
-    QTreeWidgetItem *root = new QTreeWidgetItem(ui->treeWidgetDatabases->itemAt(0, 0));
-    // If there are databases saved then they get loaded and select one in the right menu
-    // else deactivate all input fields
-
-    if(root->childCount() != 0)
-    {
-        //Load the saved database names and add them to the tree widget
-        QTreeWidgetItem *root = new QTreeWidgetItem(ui->treeWidgetDatabases->itemAt(0, 0));
-        QList<QString> databaseNames = xmlHandler.getAllDbNames();
-        QList<QTreeWidgetItem *>items;
-        qDebug() << "databasenames size " << databaseNames.size();
-        for (QString name : databaseNames)
-            root->setText(0, name);
-    }
-    else
-    {
-        //deactivate all input fields
-        for(int i = 0; i < ui->formLayoutData->count(); i++)
-            ui->formLayoutData->itemAt(i)->widget()->setEnabled(false);
-        for (int i = 0; i < ui->verticalLayoutComment->count(); i++)
-            ui->verticalLayoutComment->itemAt(i)->widget()->setEnabled(false);
-    }
-    */
+    QTreeWidgetItem *root = ui->treeWidgetDatabases->topLevelItem(0);
+    QTreeWidgetItem *childItem = new QTreeWidgetItem;
+    QString name("New Database " + QString::number(dbCnt++));
+    Database database(Database::cntID++, name, "", "", "", "", "");
+    databasesList.append(database);
+    childItem->setText(0, database.getInternalDbName());
+    childItem->setData(0, Qt::UserRole, database.getID());
+    root->addChild(childItem);
 }
+
 
 void DialogDatabaseManager::on_pushBtnNewDb_clicked()
 {
-    addChildToTree(ui->treeWidgetDatabases->topLevelItem(0), "New database");
+    addRootChild();
 }
 
-void DialogDatabaseManager::addChildToTree(QTreeWidgetItem *parent, QString name)
-{   
-    QTreeWidgetItem *db = new QTreeWidgetItem();
-    db->setText(0, name);
-    parent->addChild(db);
-}
-
-
-
-
-void DialogDatabaseManager::on_treeWidgetDatabases_itemSelectionChanged()
+void DialogDatabaseManager::on_pushBtnDeleteDb_clicked()
 {
-    // If the selected item is the root item then make the input fields not useable.
-    // Else make then useable.
-    QTreeWidgetItem *root = ui->treeWidgetDatabases->topLevelItem(0);
-    if (!root->isSelected())
+    QTreeWidgetItem *currentItem = ui->treeWidgetDatabases->currentItem();
+    int crnItemID = currentItem->data(0, Qt::UserRole).toInt();
+    databasesList.removeAt(getDbPositionInDbList(crnItemID));
+    delete currentItem;
+}
+
+void DialogDatabaseManager::on_treeWidgetDatabases_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous)
+{
+    // Save the data in the fields in the database class if the previous item is not 0
+    if (previous)
     {
-        for(int i = 0; i < ui->formLayoutData->count(); i++)
-            ui->formLayoutData->itemAt(i)->widget()->setEnabled(true);
-        for (int i = 0; i < ui->verticalLayoutComment->count(); i++)
-            ui->verticalLayoutComment->itemAt(i)->widget()->setEnabled(true);
+        int prevItemID = previous->data(0, Qt::UserRole).toInt();
+        Database &prevDatabase = databasesList[getDbPositionInDbList(prevItemID)];
+        QString prevDbName = ui->lineEdDbName->text();
+        QString prevHostName = ui->lineEdHostName->text();
+        QString prevUserName = ui->lineEdUserName->text();
+        QString prevPassword = ui->lineEdPassword->text();
+        QString prevComment = ui->textEdComment->toPlainText();
+        prevDatabase.setDbName(prevDbName);
+        prevDatabase.setHostName(prevHostName);
+        prevDatabase.setUserName(prevUserName);
+        prevDatabase.setPasswort(prevPassword);
+        prevDatabase.setComment(prevComment);
     }
-    else
+    // Show the data from the current database if its the top level item
+    if (current != ui->treeWidgetDatabases->topLevelItem(0))
     {
-        for(int i = 0; i < ui->formLayoutData->count(); i++)
-            ui->formLayoutData->itemAt(i)->widget()->setEnabled(false);
-        for (int i = 0; i < ui->verticalLayoutComment->count(); i++)
-            ui->verticalLayoutComment->itemAt(i)->widget()->setEnabled(false);
+        int crnItemID = current->data(0, Qt::UserRole).toInt();
+        Database &crnDatabase = databasesList[getDbPositionInDbList(crnItemID)];
+        QString crnDbName = crnDatabase.getDbName();
+        QString crnHostName = crnDatabase.getHostName();
+        QString crnUserName = crnDatabase.getUserName();
+        QString crnPassword = crnDatabase.getPasswort();
+        QString crnComment = crnDatabase.getComment();
+        ui->lineEdDbName->setText(crnDbName);
+        ui->lineEdHostName->setText(crnHostName);
+        ui->lineEdUserName->setText(crnUserName);
+        ui->lineEdPassword->setText(crnPassword);
+        ui->textEdComment->setText(crnComment);
     }
+
+
+}
+
+int DialogDatabaseManager::getDbPositionInDbList(int currentItemID){
+    for (int i = 0; i < databasesList.size(); i++)
+    {
+        Database database = databasesList.at(i);
+        if (currentItemID == database.getID())
+            return i;
+    }
+    return -1;
 }
