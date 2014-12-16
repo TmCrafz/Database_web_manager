@@ -7,82 +7,150 @@
     <x>0</x>
     <y>0</y>
     <width>675</width>
-    <height>481</height>
+    <height>646</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QTextBrowser" name="textBrowserStatus">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>30</y>
-      <width>671</width>
-      <height>71</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QWidget" name="">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>0</y>
-      <width>661</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QLabel" name="labelDbName">
-       <property name="text">
-        <string>DB name:</string>
-       </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLabel" name="labelDbName">
+        <property name="text">
+         <string>DB name:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lineEdDbNameQui"/>
+      </item>
+      <item>
+       <widget class="QLabel" name="labelHostName">
+        <property name="text">
+         <string>Hostname:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lineEdHostNameQui"/>
+      </item>
+      <item>
+       <widget class="QLabel" name="labelUserName">
+        <property name="text">
+         <string>Username:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lineEdUserNameQui"/>
+      </item>
+      <item>
+       <widget class="QLabel" name="labelPassword">
+        <property name="text">
+         <string>Password:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lineEdPasswordQui"/>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushBtnConnectQui">
+        <property name="text">
+         <string>Connect</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QTextBrowser" name="textBrowserStatus">
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>70</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="tab">
+       <attribute name="title">
+        <string>Tab 1</string>
+       </attribute>
+       <widget class="QWidget" name="">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>40</y>
+          <width>611</width>
+          <height>391</height>
+         </rect>
+        </property>
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="3" column="0" colspan="3">
+          <widget class="QPlainTextEdit" name="plainTextEdContentFc"/>
+         </item>
+         <item row="4" column="2">
+          <widget class="QPushButton" name="pushBtnAddEntryFc">
+           <property name="text">
+            <string>Add</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="labelTitleFc">
+           <property name="text">
+            <string>Title</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="labelContentFc">
+           <property name="text">
+            <string>Content</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0" colspan="3">
+          <widget class="QLineEdit" name="lineEdTitleFc"/>
+         </item>
+         <item row="4" column="0" colspan="2">
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </widget>
       </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="lineEdDbNameQui"/>
-     </item>
-     <item>
-      <widget class="QLabel" name="labelHostName">
-       <property name="text">
-        <string>Hostname:</string>
-       </property>
+      <widget class="QWidget" name="tab_2">
+       <attribute name="title">
+        <string>Tab 2</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QTableWidget" name="tableWidgetDbTableEntries"/>
+        </item>
+       </layout>
       </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="lineEdHostNameQui"/>
-     </item>
-     <item>
-      <widget class="QLabel" name="labelUserName">
-       <property name="text">
-        <string>Username:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="lineEdUserNameQui"/>
-     </item>
-     <item>
-      <widget class="QLabel" name="labelPassword">
-       <property name="text">
-        <string>Password:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="lineEdPasswordQui"/>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushBtnConnectQui">
-       <property name="text">
-        <string>Connect</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
+     </widget>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">

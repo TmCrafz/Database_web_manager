@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QTreeWidget>
 #include <QString>
+#include <QMessageBox>
 #include "xmlhandler.h"
 
 namespace Ui {

@@ -1,4 +1,3 @@
-#include <QtSql/QSqlDatabase>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -56,7 +55,89 @@ void MainWindow::connectWithDb(Database &database)
         ui->textBrowserStatus->append("<font color = green>Connected with databank</font>");
     }
 
+    QStringList tables = db.tables(QSql::Tables);
+    ui->textBrowserStatus->append("Tables found:");
+    for (QString table : tables)
+        ui->textBrowserStatus->append(table);
 
-    qDebug() << QSqlDatabase::drivers();
+    QSqlQuery query;
+    if (!query.exec(QString("SELECT * FROM " + tables.at(0))))
+    {
+        ui->textBrowserStatus->append("<font color = red>Cannot open table: " + tables.at(0) + "</font>");
+    }
+    else
+    {
+        ui->textBrowserStatus->append("<font color = green>Opend table : " + tables.at(0) + "</font>");
+    }
 
+    QSqlRecord rec = query.record();
+    //Load the header of the db table widget
+    int clmCnt = rec.count();
+    ui->textBrowserStatus->append("found number of columns: " + QString::number(clmCnt));
+    ui->tableWidgetDbTableEntries->setColumnCount(clmCnt);
+    QStringList columnsList;
+    for (int i = 0; i != clmCnt; i++)
+    {
+        columnsList.append(rec.fieldName(i));
+        ui->tableWidgetDbTableEntries->setHorizontalHeaderItem(i, new QTableWidgetItem(rec.fieldName(i)));
+    }
+    ui->textBrowserStatus->append("found columns:");
+    for (auto columnName : columnsList)
+        ui->textBrowserStatus->append(columnName);
+    //Load the entries
+    int rowCnt = 0;
+    while(query.next())
+    {
+        ui->tableWidgetDbTableEntries->insertRow(rowCnt);
+        for (int i = 0; i != clmCnt; i++)
+        {
+            QTableWidgetItem *item = new QTableWidgetItem(query.value(i).toString());
+            ui->tableWidgetDbTableEntries->setItem(rowCnt, i, item);
+        }
+        rowCnt++;
+    }
+
+
+
+
+}
+
+void MainWindow::on_pushBtnAddEntryFc_clicked()
+{
+    QSqlDatabase db = QSqlDatabase::database();
+    QStringList tables = db.tables(QSql::Tables);
+    ui->textBrowserStatus->append("Tables:");
+    for (QString table : tables)
+        ui->textBrowserStatus->append(table);
+
+    QSqlQuery query;
+    // Load table
+    if (!query.exec(QString("SELECT * FROM " + tables.at(0))))
+    {
+        ui->textBrowserStatus->append("<font color = red>Cannot open table: " + tables.at(0) + "</font>");
+    }
+    else
+    {
+        ui->textBrowserStatus->append("<font color = green>Opend table : " + tables.at(0) + "</font>");
+    }
+
+    QSqlRecord rec = query.record();
+    int clmCnt = rec.count();
+    ui->textBrowserStatus->append("Number of columns: " + QString::number(clmCnt));
+    QStringList columnsList;
+    for (int i = 0; i != clmCnt; i++)
+        columnsList.append(rec.fieldName(i));
+    ui->textBrowserStatus->append("column names:");
+
+    //Add Entry
+    QString title = ui->lineEdTitleFc->text();
+    QString content = ui->plainTextEdContentFc->toPlainText();
+    QDateTime currentTime = QDateTime::currentDateTime();
+
+    query.prepare("INSERT INTO " + tables.at(0) + " (" + columnsList.at(1) + ", " + columnsList.at(2) + ", " + columnsList.at(3) + ") "
+                  "VALUES (?, ?, ?)");
+    query.addBindValue(title);
+    query.addBindValue(currentTime);
+    query.addBindValue(content);
+    query.exec();
 }
