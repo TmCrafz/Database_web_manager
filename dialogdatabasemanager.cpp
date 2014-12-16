@@ -31,13 +31,19 @@ DialogDatabaseManager::~DialogDatabaseManager()
 void DialogDatabaseManager::addRootChild()
 {
     QTreeWidgetItem *root = ui->treeWidgetDatabases->topLevelItem(0);
-    QTreeWidgetItem *childItem = new QTreeWidgetItem;
+    QTreeWidgetItem *childItem = new QTreeWidgetItem;    
     QString name("New Database " + QString::number(dbCnt++));
+    while (isNameAlreayExistingAfterCreatingNewDb(name))
+        name = "New Database " + QString::number(dbCnt++);
     Database database(Database::cntID++, name, "", "", "", "", "");
     databasesList.append(database);
     childItem->setText(0, database.getInternalDbName());
     childItem->setData(0, Qt::UserRole, database.getID());
+    //Save the internal name so that the name can get restored after changing it when the new name alredy exists
+    childItem->setData(1, Qt::UserRole, database.getInternalDbName());
+    childItem->setFlags(childItem->flags() | Qt::ItemIsEditable);
     root->addChild(childItem);
+
 }
 
 void DialogDatabaseManager::addRootChildFromLoaded(Database &database)
@@ -46,12 +52,27 @@ void DialogDatabaseManager::addRootChildFromLoaded(Database &database)
     QTreeWidgetItem *childItem = new QTreeWidgetItem;
     childItem->setText(0, database.getInternalDbName());
     childItem->setData(0, Qt::UserRole, database.getID());
+    //Save the internal name so that the name can get restored after changing it when the new name alredy exists
+    childItem->setData(1, Qt::UserRole, database.getInternalDbName());
     root->addChild(childItem);
     childItem->setFlags(childItem->flags() | Qt::ItemIsEditable);
 }
 
+bool DialogDatabaseManager::isNameAlreayExistingAfterCreatingNewDb(QString name)
+{
+    for (Database database: databasesList)
+    {
+        if (name == database.getInternalDbName())
+            return true;
+    }
+    return false;
+}
+
 void DialogDatabaseManager::setInputFieldsEnabled(bool status)
 {
+    //Make the fiels enabled/ unenabled which are associated with the database (input fields, delete btn, connect btn usw)
+    ui->pushBtnConnect->setEnabled(status);
+    ui->pushBtnDeleteDb->setEnabled(status);
     for(int i = 0; i < ui->formLayoutData->count(); i++)
         ui->formLayoutData->itemAt(i)->widget()->setEnabled(status);
     for (int i = 0; i < ui->verticalLayoutComment->count(); i++)
@@ -71,6 +92,8 @@ bool DialogDatabaseManager::matchesTextWithDatabasesListInternalName(const QStri
 {
     for (Database database: databasesList)
     {
+        // The second statement is important, withit it can be checked if the name is the name
+        // of the new object and there the logical must match.
         if (text == database.getInternalDbName() && crnID != database.getID())
             return true;
     }
@@ -202,12 +225,18 @@ void DialogDatabaseManager::on_treeWidgetDatabases_itemChanged(QTreeWidgetItem *
     QString itemText = item->text(column);
     int crnID = item->data(0, Qt::UserRole).toInt();
     if (matchesTextWithDatabasesListInternalName(itemText, crnID))
-    {
-        qDebug() << "matches";
-        //item->setFlags(item->flags() | Qt::ItemIsEditable);
-        //ui->treeWidgetDatabases->setCurrentItem(item);
-        //ui->treeWidgetDatabases->editItem(item, column);
+    {        
+        //Restore the old name before changing it.
+        QString oldInternalName = item->data(1, Qt::UserRole).toString();
+        item->setText(0, oldInternalName);
+        QMessageBox::warning(this, "Name already exists", "It seems like the name for the database already exists. Please choose another one.");
     }
+    else
+    {
+        //Store the new internal name in the item data. So that it can be get restored after a new change when it match with another internal name.
+        item->setData(1, Qt::UserRole, itemText);
+    }
+
     qDebug() << "item changed";
 }
 

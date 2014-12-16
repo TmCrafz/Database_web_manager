@@ -44,5 +44,6 @@ void MainWindow::connectWithDb(Database &database)
     else
         qDebug() << "Connect with db";
 
+    qDebug() << QSqlDatabase::drivers();
 
 }

@@ -20,6 +20,7 @@ public:
 
     void addRootChild();
     void addRootChildFromLoaded(Database &database);
+    bool isNameAlreayExistingAfterCreatingNewDb(QString name);
     void setInputFieldsEnabled(bool status);
     void clearInputFields();
     bool matchesTextWithDatabasesListInternalName(const QString text, int crnID);
