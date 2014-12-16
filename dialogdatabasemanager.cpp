@@ -236,7 +236,6 @@ void DialogDatabaseManager::on_treeWidgetDatabases_itemChanged(QTreeWidgetItem *
         //Store the new internal name in the item data. So that it can be get restored after a new change when it match with another internal name.
         item->setData(1, Qt::UserRole, itemText);
     }
-
     qDebug() << "item changed";
 }
 

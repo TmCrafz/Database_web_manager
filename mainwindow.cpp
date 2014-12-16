@@ -9,6 +9,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    ui->lineEdPasswordQui->setEchoMode(QLineEdit::Password);
+
 
 }
 
@@ -26,7 +28,6 @@ void MainWindow::on_actionDatabase_manager_triggered()
 
 void MainWindow::connectWithDb(Database &database)
 {
-
     qDebug() << "Connect to db: " << database.getInternalDbName();
     qDebug() << "Db name: " << database.getDbName();
     qDebug() << "Hostname " << database.getHostName();
@@ -34,15 +35,27 @@ void MainWindow::connectWithDb(Database &database)
     qDebug() << "Password: " << database.getPasswort();
     qDebug() << "Commment: " << database.getComment();
 
+    ui->textBrowserStatus->append("Connecting to database " + database.getInternalDbName() + "...");
+    ui->textBrowserStatus->append("Database name: " + database.getDbName());
+    ui->textBrowserStatus->append("Hostname " + database.getHostName());
+    ui->textBrowserStatus->append("Username " + database.getUserName());
+
     QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
     db.setHostName(database.getHostName());
     db.setDatabaseName(database.getDbName());
     db.setUserName(database.getUserName());
     db.setPassword(database.getPasswort());
     if(!db.open())
+    {
         qDebug() << "Cant connect with db";
+        ui->textBrowserStatus->append("<font color = red>Cannot connect with databank (wrong password?)</font>");
+    }
     else
-        qDebug() << "Connect with db";
+    {
+        qDebug() << "Connected with databank";
+        ui->textBrowserStatus->append("<font color = green>Connected with databank</font>");
+    }
+
 
     qDebug() << QSqlDatabase::drivers();
 

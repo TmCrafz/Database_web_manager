@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>626</width>
+    <width>675</width>
     <height>481</height>
    </rect>
   </property>
@@ -14,15 +14,74 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QTextBrowser" name="textBrowser">
+   <widget class="QTextBrowser" name="textBrowserStatus">
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>0</y>
-      <width>621</width>
+      <y>30</y>
+      <width>671</width>
       <height>71</height>
      </rect>
     </property>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>0</y>
+      <width>661</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="labelDbName">
+       <property name="text">
+        <string>DB name:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="lineEdDbNameQui"/>
+     </item>
+     <item>
+      <widget class="QLabel" name="labelHostName">
+       <property name="text">
+        <string>Hostname:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="lineEdHostNameQui"/>
+     </item>
+     <item>
+      <widget class="QLabel" name="labelUserName">
+       <property name="text">
+        <string>Username:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="lineEdUserNameQui"/>
+     </item>
+     <item>
+      <widget class="QLabel" name="labelPassword">
+       <property name="text">
+        <string>Password:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="lineEdPasswordQui"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushBtnConnectQui">
+       <property name="text">
+        <string>Connect</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -30,7 +89,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>626</width>
+     <width>675</width>
      <height>21</height>
     </rect>
    </property>
