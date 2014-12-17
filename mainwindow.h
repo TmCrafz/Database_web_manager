@@ -29,6 +29,8 @@ private slots:
 
     void on_treeWidgetLoadedTables_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
 
+    void on_pushBtnConnectQui_clicked();
+
 private:
     Ui::MainWindow *ui;
 

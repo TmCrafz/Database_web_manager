@@ -165,3 +165,13 @@ void MainWindow::on_treeWidgetLoadedTables_currentItemChanged(QTreeWidgetItem *c
 
     }
 }
+
+void MainWindow::on_pushBtnConnectQui_clicked()
+{
+    QString dbName = ui->lineEdDbNameQui->text();
+    QString hostName = ui->lineEdHostNameQui->text();
+    QString userName = ui->lineEdUserNameQui->text();
+    QString password = ui->lineEdPasswordQui->text();
+    Database database(0, "Quick_connect", dbName, hostName, userName, password, "");
+    connectWithDb(database);
+}
