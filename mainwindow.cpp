@@ -9,8 +9,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     ui->lineEdPasswordQui->setEchoMode(QLineEdit::Password);
-
-
+    ui->splitter->setStretchFactor(1, 1);
+    ui->treeWidgetLoadedTables->header()->close();
 }
 
 MainWindow::~MainWindow()
@@ -58,48 +58,26 @@ void MainWindow::connectWithDb(Database &database)
     QStringList tables = db.tables(QSql::Tables);
     ui->textBrowserStatus->append("Tables found:");
     for (QString table : tables)
+    {
         ui->textBrowserStatus->append(table);
-
-    QSqlQuery query;
-    if (!query.exec(QString("SELECT * FROM " + tables.at(0))))
-    {
-        ui->textBrowserStatus->append("<font color = red>Cannot open table: " + tables.at(0) + "</font>");
+        QTreeWidgetItem *item = new QTreeWidgetItem();
+        item->setText(0, table);
+        ui->treeWidgetLoadedTables->topLevelItem(0)->addChild(item);
     }
-    else
+    //Choose the first child item
+    if (tables.size() > 0)
     {
-        ui->textBrowserStatus->append("<font color = green>Opend table : " + tables.at(0) + "</font>");
+        QTreeWidgetItem *firstChildItem = ui->treeWidgetLoadedTables->topLevelItem(0)->child(0);
+        ui->treeWidgetLoadedTables->setCurrentItem(firstChildItem);
+
     }
+}
 
-    QSqlRecord rec = query.record();
-    //Load the header of the db table widget
-    int clmCnt = rec.count();
-    ui->textBrowserStatus->append("found number of columns: " + QString::number(clmCnt));
-    ui->tableWidgetDbTableEntries->setColumnCount(clmCnt);
-    QStringList columnsList;
-    for (int i = 0; i != clmCnt; i++)
-    {
-        columnsList.append(rec.fieldName(i));
-        ui->tableWidgetDbTableEntries->setHorizontalHeaderItem(i, new QTableWidgetItem(rec.fieldName(i)));
-    }
-    ui->textBrowserStatus->append("found columns:");
-    for (auto columnName : columnsList)
-        ui->textBrowserStatus->append(columnName);
-    //Load the entries
-    int rowCnt = 0;
-    while(query.next())
-    {
-        ui->tableWidgetDbTableEntries->insertRow(rowCnt);
-        for (int i = 0; i != clmCnt; i++)
-        {
-            QTableWidgetItem *item = new QTableWidgetItem(query.value(i).toString());
-            ui->tableWidgetDbTableEntries->setItem(rowCnt, i, item);
-        }
-        rowCnt++;
-    }
-
-
-
-
+void MainWindow::clearAllShownDbFields()
+{
+    ui->tableWidgetDbTableEntries->clear();
+    ui->tableWidgetDbTableEntries->setRowCount(0);
+    ui->tableWidgetDbTableEntries->setColumnCount(0);
 }
 
 void MainWindow::on_pushBtnAddEntryFc_clicked()
@@ -140,4 +118,50 @@ void MainWindow::on_pushBtnAddEntryFc_clicked()
     query.addBindValue(currentTime);
     query.addBindValue(content);
     query.exec();
+}
+
+void MainWindow::on_treeWidgetLoadedTables_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous)
+{
+    //Load the data of the selected table if the current item is not the top level item
+    clearAllShownDbFields();
+    if (current != ui->treeWidgetLoadedTables->topLevelItem(0))
+    {
+        QSqlQuery query;
+        const QString TableName = current->text(0);
+        if (!query.exec(QString("SELECT * FROM " + TableName)))
+        {
+            ui->textBrowserStatus->append("<font color = red>Cannot open table: " + TableName + "</font>");
+        }
+        else
+        {
+            ui->textBrowserStatus->append("<font color = green>Opend table : " + TableName + "</font>");
+        }
+        QSqlRecord rec = query.record();
+        //Load the header of the db table widget
+        int clmCnt = rec.count();
+        ui->textBrowserStatus->append("found number of columns: " + QString::number(clmCnt));
+        ui->tableWidgetDbTableEntries->setColumnCount(clmCnt);
+        QStringList columnsList;
+        for (int i = 0; i != clmCnt; i++)
+        {
+            columnsList.append(rec.fieldName(i));
+            ui->tableWidgetDbTableEntries->setHorizontalHeaderItem(i, new QTableWidgetItem(rec.fieldName(i)));
+        }
+        ui->textBrowserStatus->append("found columns:");
+        for (auto columnName : columnsList)
+            ui->textBrowserStatus->append(columnName);
+        //Load the entries
+        int rowCnt = 0;
+        while(query.next())
+        {
+            ui->tableWidgetDbTableEntries->insertRow(rowCnt);
+            for (int i = 0; i != clmCnt; i++)
+            {
+                QTableWidgetItem *item = new QTableWidgetItem(query.value(i).toString());
+                ui->tableWidgetDbTableEntries->setItem(rowCnt, i, item);
+            }
+            rowCnt++;
+        }
+
+    }
 }
