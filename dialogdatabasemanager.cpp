@@ -232,7 +232,8 @@ void DialogDatabaseManager::on_buttonBox_accepted()
 void DialogDatabaseManager::on_treeWidgetDatabases_itemChanged(QTreeWidgetItem *item, int column)
 {
     //If the new InternalDbName is already taken, then let the user set a new one.
-    QString itemText = item->text(column);
+    QString itemText = item->text(0);
+    qDebug() << "ITEMTEXT: " << itemText;
     int crnID = item->data(0, Qt::UserRole).toInt();
     if (matchesTextWithDatabasesListInternalName(itemText, crnID) || itemText == "")
     {        
@@ -243,8 +244,12 @@ void DialogDatabaseManager::on_treeWidgetDatabases_itemChanged(QTreeWidgetItem *
     }
     else
     {
-        //Store the new internal name in the item data. So that it can be get restored after a new change when it match with another internal name.
+        //Store the new internal name in the item data. So that it can be get restored after a new change when it match with another internal name
+        //and store the new internalDbName in the databse object.
         item->setData(1, Qt::UserRole, itemText);
+        int crnItemID = item->data(0, Qt::UserRole).toInt();
+        Database &database = databasesList[getDbPositionInDbList(crnItemID)];
+        database.setInternalDbName(itemText);
     }
 }
 
