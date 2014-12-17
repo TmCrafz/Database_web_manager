@@ -22,6 +22,14 @@ DialogDatabaseManager::DialogDatabaseManager(QWidget *parent) :
         database.setID(Database::cntID++);
         addRootChildFromLoaded(database);
     }
+    //Select the first item when aviable
+    if (ui->treeWidgetDatabases->topLevelItem(0)->childCount() > 0)
+    {
+        QTreeWidgetItem *firstChildItem = ui->treeWidgetDatabases->topLevelItem(0)->child(0);
+        ui->treeWidgetDatabases->setCurrentItem(firstChildItem);
+    }
+
+
 }
 
 DialogDatabaseManager::~DialogDatabaseManager()
