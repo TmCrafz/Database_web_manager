@@ -56,6 +56,9 @@ void MainWindow::connectWithDb(Database &database)
     }
 
     QStringList tables = db.tables(QSql::Tables);
+    //Clear current treeWidget items when existing
+    ui->treeWidgetLoadedTables->topLevelItem(0)->takeChildren();
+    //Add tables to treeWidget
     ui->textBrowserStatus->append("Tables found:");
     for (QString table : tables)
     {
@@ -162,7 +165,6 @@ void MainWindow::on_treeWidgetLoadedTables_currentItemChanged(QTreeWidgetItem *c
             }
             rowCnt++;
         }
-
     }
 }
 
