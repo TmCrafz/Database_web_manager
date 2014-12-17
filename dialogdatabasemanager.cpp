@@ -140,7 +140,9 @@ void DialogDatabaseManager::on_pushBtnConnect_clicked()
     database.setComment(comment);
 
     xmlHandler.saveAllDbs(databasesList);
+
     emit connectToDB(database);
+    this->close();
 }
 
 void DialogDatabaseManager::on_treeWidgetDatabases_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous)
