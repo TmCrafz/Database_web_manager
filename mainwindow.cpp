@@ -84,6 +84,46 @@ void MainWindow::clearAllShownDbFields()
     ui->tableWidgetDbTableEntries->setColumnCount(0);
 }
 
+void MainWindow::loadTableEnries(const QString TableName)
+{
+    QSqlQuery query;
+
+    if (!query.exec(QString("SELECT * FROM " + TableName)))
+    {
+        ui->textBrowserStatus->append("<font color = red>Cannot open table: " + TableName + "</font>");
+    }
+    else
+    {
+        ui->textBrowserStatus->append("<font color = green>Opend table : " + TableName + "</font>");
+    }
+    QSqlRecord rec = query.record();
+    //Load the header of the db table widget
+    int clmCnt = rec.count();
+    ui->textBrowserStatus->append("found number of columns: " + QString::number(clmCnt));
+    ui->tableWidgetDbTableEntries->setColumnCount(clmCnt);
+    QStringList columnsList;
+    for (int i = 0; i != clmCnt; i++)
+    {
+        columnsList.append(rec.fieldName(i));
+        ui->tableWidgetDbTableEntries->setHorizontalHeaderItem(i, new QTableWidgetItem(rec.fieldName(i)));
+    }
+    ui->textBrowserStatus->append("found columns:");
+    for (auto columnName : columnsList)
+        ui->textBrowserStatus->append(columnName);
+    //Load the entries
+    int rowCnt = 0;
+    while(query.next())
+    {
+        ui->tableWidgetDbTableEntries->insertRow(rowCnt);
+        for (int i = 0; i != clmCnt; i++)
+        {
+            QTableWidgetItem *item = new QTableWidgetItem(query.value(i).toString());
+            ui->tableWidgetDbTableEntries->setItem(rowCnt, i, item);
+        }
+        rowCnt++;
+    }
+}
+
 void MainWindow::on_pushBtnAddEntryFc_clicked()
 {
     QSqlDatabase db = QSqlDatabase::database();
@@ -122,6 +162,13 @@ void MainWindow::on_pushBtnAddEntryFc_clicked()
     query.addBindValue(currentTime);
     query.addBindValue(content);
     query.exec();
+    // If the current selected table is not the TopLevelItem reload the data in the table
+    if (ui->treeWidgetLoadedTables->currentItem() != ui->treeWidgetLoadedTables->topLevelItem(0))
+    {
+        const QString selectedTableName = ui->treeWidgetLoadedTables->currentItem()->text(0);
+        clearAllShownDbFields();
+        loadTableEnries(selectedTableName);
+    }
 }
 
 void MainWindow::on_treeWidgetLoadedTables_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous)
@@ -130,43 +177,11 @@ void MainWindow::on_treeWidgetLoadedTables_currentItemChanged(QTreeWidgetItem *c
     clearAllShownDbFields();
     if (current != ui->treeWidgetLoadedTables->topLevelItem(0))
     {
-        QSqlQuery query;
         const QString TableName = current->text(0);
-        if (!query.exec(QString("SELECT * FROM " + TableName)))
-        {
-            ui->textBrowserStatus->append("<font color = red>Cannot open table: " + TableName + "</font>");
-        }
-        else
-        {
-            ui->textBrowserStatus->append("<font color = green>Opend table : " + TableName + "</font>");
-        }
-        QSqlRecord rec = query.record();
-        //Load the header of the db table widget
-        int clmCnt = rec.count();
-        ui->textBrowserStatus->append("found number of columns: " + QString::number(clmCnt));
-        ui->tableWidgetDbTableEntries->setColumnCount(clmCnt);
-        QStringList columnsList;
-        for (int i = 0; i != clmCnt; i++)
-        {
-            columnsList.append(rec.fieldName(i));
-            ui->tableWidgetDbTableEntries->setHorizontalHeaderItem(i, new QTableWidgetItem(rec.fieldName(i)));
-        }
-        ui->textBrowserStatus->append("found columns:");
-        for (auto columnName : columnsList)
-            ui->textBrowserStatus->append(columnName);
-        //Load the entries
-        int rowCnt = 0;
-        while(query.next())
-        {
-            ui->tableWidgetDbTableEntries->insertRow(rowCnt);
-            for (int i = 0; i != clmCnt; i++)
-            {
-                QTableWidgetItem *item = new QTableWidgetItem(query.value(i).toString());
-                ui->tableWidgetDbTableEntries->setItem(rowCnt, i, item);
-            }
-            rowCnt++;
-        }
+        loadTableEnries(TableName);
     }
+
+
 }
 
 void MainWindow::on_pushBtnConnectQui_clicked()

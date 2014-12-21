@@ -21,6 +21,7 @@ public:
     ~MainWindow();
 
     void clearAllShownDbFields();
+    void loadTableEnries(const QString TableName);
 private slots:
     void on_actionDatabase_manager_triggered();
     void connectWithDb(Database &database);
