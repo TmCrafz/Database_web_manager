@@ -53,27 +53,28 @@ void MainWindow::connectWithDb(Database &database)
     {
         qDebug() << "Connected with databank";
         ui->textBrowserStatus->append("<font color = green>Connected with databank</font>");
+        QStringList tables = db.tables(QSql::Tables);
+        //Clear current treeWidget items when existing
+        ui->treeWidgetLoadedTables->topLevelItem(0)->takeChildren();
+        //Add tables to treeWidget
+        ui->textBrowserStatus->append("Tables found:");
+        for (QString table : tables)
+        {
+            ui->textBrowserStatus->append(table);
+            QTreeWidgetItem *item = new QTreeWidgetItem();
+            item->setText(0, table);
+            ui->treeWidgetLoadedTables->topLevelItem(0)->addChild(item);
+        }
+        //Choose the first child item
+        if (tables.size() > 0)
+        {
+            QTreeWidgetItem *firstChildItem = ui->treeWidgetLoadedTables->topLevelItem(0)->child(0);
+            ui->treeWidgetLoadedTables->setCurrentItem(firstChildItem);
+
+        }
     }
 
-    QStringList tables = db.tables(QSql::Tables);
-    //Clear current treeWidget items when existing
-    ui->treeWidgetLoadedTables->topLevelItem(0)->takeChildren();
-    //Add tables to treeWidget
-    ui->textBrowserStatus->append("Tables found:");
-    for (QString table : tables)
-    {
-        ui->textBrowserStatus->append(table);
-        QTreeWidgetItem *item = new QTreeWidgetItem();
-        item->setText(0, table);
-        ui->treeWidgetLoadedTables->topLevelItem(0)->addChild(item);
-    }
-    //Choose the first child item
-    if (tables.size() > 0)
-    {
-        QTreeWidgetItem *firstChildItem = ui->treeWidgetLoadedTables->topLevelItem(0)->child(0);
-        ui->treeWidgetLoadedTables->setCurrentItem(firstChildItem);
 
-    }
 }
 
 void MainWindow::clearAllShownDbFields()
