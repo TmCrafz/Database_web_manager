@@ -2,11 +2,12 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "dialogdatabasemanager.h"
 #include <QtSql/QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QDateTime>
+#include <QTableWidget>
+#include "dialogdatabasemanager.h"
 
 namespace Ui {
 class MainWindow;
@@ -15,6 +16,9 @@ class MainWindow;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
+
+private:
+    bool loadingPhase;
 
 public:
     explicit MainWindow(QWidget *parent = 0);
@@ -31,6 +35,12 @@ private slots:
     void on_treeWidgetLoadedTables_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
 
     void on_pushBtnConnectQui_clicked();
+
+
+
+
+
+    void on_tableWidgetDbTableEntries_itemChanged(QTableWidgetItem *item);
 
 private:
     Ui::MainWindow *ui;

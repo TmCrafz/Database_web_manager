@@ -4,7 +4,8 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    loadingPhase(false)
 {
     ui->setupUi(this);
 
@@ -27,6 +28,7 @@ void MainWindow::on_actionDatabase_manager_triggered()
 
 void MainWindow::connectWithDb(Database &database)
 {
+    loadingPhase = true;
     qDebug() << "Connect to db: " << database.getInternalDbName();
     qDebug() << "Db name: " << database.getDbName();
     qDebug() << "Hostname " << database.getHostName();
@@ -74,7 +76,7 @@ void MainWindow::connectWithDb(Database &database)
         }
     }
 
-
+    loadingPhase = false;
 }
 
 void MainWindow::clearAllShownDbFields()
@@ -86,6 +88,7 @@ void MainWindow::clearAllShownDbFields()
 
 void MainWindow::loadTableEnries(const QString TableName)
 {
+    loadingPhase = true;
     QSqlQuery query;
 
     if (!query.exec(QString("SELECT * FROM " + TableName)))
@@ -122,6 +125,7 @@ void MainWindow::loadTableEnries(const QString TableName)
         }
         rowCnt++;
     }
+    loadingPhase = false;
 }
 
 void MainWindow::on_pushBtnAddEntryFc_clicked()
@@ -193,3 +197,29 @@ void MainWindow::on_pushBtnConnectQui_clicked()
     Database database(0, "Quick_connect", dbName, hostName, userName, password, "");
     connectWithDb(database);
 }
+
+void MainWindow::on_tableWidgetDbTableEntries_itemChanged(QTableWidgetItem *item)
+{
+    // Update the field in the db which was edit in the table widget, but only when the programm is not
+    // loading the data (because then tablewidget calls itemChanged() too).
+    if (!loadingPhase)
+    {
+        qDebug() << "itemChanged";
+        QString currnetTable = ui->treeWidgetLoadedTables->currentItem()->text(0);
+        QString headerName = ui->tableWidgetDbTableEntries->horizontalHeaderItem(item->column())->text();
+        qDebug() << "Item row " << item->row();
+
+        QString id = ui->tableWidgetDbTableEntries->item(item->row(), 0)->text();
+        QString updateField = "UPDATE " + currnetTable + " SET " + headerName + "=" + "'" + item->text() + "' " +
+                "WHERE " + ui->tableWidgetDbTableEntries->horizontalHeaderItem(0)->text() + "=" + "'" + id + "'";
+
+        QSqlQuery query;
+        if(!query.exec(updateField))
+            qDebug() << "Cant update";
+        else
+            qDebug() << "updated";
+    }
+
+}
+
+
