@@ -108,7 +108,7 @@ void MainWindow::loadTableEnries(const QString TableName)
     for (int i = 0; i != clmCnt; i++)
     {
         columnsList.append(rec.fieldName(i));
-        ui->tableWidgetDbTableEntries->setHorizontalHeaderItem(i, new QTableWidgetItem(rec.fieldName(i)));
+        ui->tableWidgetDbTableEntries->setHorizontalHeaderItem(i, new QTableWidgetItem(rec.fieldName(i)));        
     }
     ui->textBrowserStatus->append("found columns:");
     for (auto columnName : columnsList)
@@ -122,6 +122,8 @@ void MainWindow::loadTableEnries(const QString TableName)
         {
             QTableWidgetItem *item = new QTableWidgetItem(query.value(i).toString());
             ui->tableWidgetDbTableEntries->setItem(rowCnt, i, item);
+            if(i == 0)
+                item->setFlags(item->flags() ^ Qt::ItemIsEditable);
         }
         rowCnt++;
     }
