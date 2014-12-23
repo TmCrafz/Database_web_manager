@@ -122,6 +122,8 @@ void MainWindow::loadTableEnries(const QString TableName)
         {
             QTableWidgetItem *item = new QTableWidgetItem(query.value(i).toString());
             ui->tableWidgetDbTableEntries->setItem(rowCnt, i, item);
+            // The first item in the row shouldnt be ditable because its normally the ID
+            // and the id is the only 100% identification possibility.
             if(i == 0)
                 item->setFlags(item->flags() ^ Qt::ItemIsEditable);
         }
@@ -214,12 +216,12 @@ void MainWindow::on_tableWidgetDbTableEntries_itemChanged(QTableWidgetItem *item
         QString id = ui->tableWidgetDbTableEntries->item(item->row(), 0)->text();
         QString updateField = "UPDATE " + currnetTable + " SET " + headerName + "=" + "'" + item->text() + "' " +
                 "WHERE " + ui->tableWidgetDbTableEntries->horizontalHeaderItem(0)->text() + "=" + "'" + id + "'";
-
+        ui->textBrowserStatus->append(updateField);
         QSqlQuery query;
         if(!query.exec(updateField))
-            qDebug() << "Cant update";
+            ui->textBrowserStatus->append("<font color = red>Cannot update row</font>");
         else
-            qDebug() << "updated";
+            ui->textBrowserStatus->append("<font color = green>Updatet row</font>");
     }
 
 }
