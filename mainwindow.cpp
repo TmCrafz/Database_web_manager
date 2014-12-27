@@ -160,16 +160,21 @@ void MainWindow::on_pushBtnAddEntryFc_clicked()
     ui->textBrowserStatus->append("column names:");
 
     //Add Entry
+    QString tag = ui->lineEdTagFc->text();
     QString title = ui->lineEdTitleFc->text();
     QString content = ui->plainTextEdContentFc->toPlainText();
     QDateTime currentTime = QDateTime::currentDateTime();
 
-    query.prepare("INSERT INTO " + tables.at(0) + " (" + columnsList.at(1) + ", " + columnsList.at(2) + ", " + columnsList.at(3) + ") "
-                  "VALUES (?, ?, ?)");
+    query.prepare("INSERT INTO " + tables.at(0) + " (" + columnsList.at(1) + ", " + columnsList.at(2) + ", " + columnsList.at(3) + ", " + columnsList.at(4) + ") "
+                  "VALUES (?, ?, ?, ?)");
+    query.addBindValue(tag);
     query.addBindValue(title);
     query.addBindValue(currentTime);
     query.addBindValue(content);
-    query.exec();
+    if (!query.exec())
+        ui->textBrowserStatus->append("<font color = red>Cannot add entry. Wrong table format?</font>");
+    else
+       ui->textBrowserStatus->append("<font color = green>Added entry</font>");
     // If the current selected table is not the TopLevelItem reload the data in the table
     if (ui->treeWidgetLoadedTables->currentItem() != ui->treeWidgetLoadedTables->topLevelItem(0))
     {
@@ -188,8 +193,6 @@ void MainWindow::on_treeWidgetLoadedTables_currentItemChanged(QTreeWidgetItem *c
         const QString TableName = current->text(0);
         loadTableEnries(TableName);
     }
-
-
 }
 
 void MainWindow::on_pushBtnConnectQui_clicked()
@@ -223,7 +226,6 @@ void MainWindow::on_tableWidgetDbTableEntries_itemChanged(QTableWidgetItem *item
         else
             ui->textBrowserStatus->append("<font color = green>Updatet row</font>");
     }
-
 }
 
 

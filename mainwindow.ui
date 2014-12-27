@@ -128,7 +128,7 @@
       </widget>
       <widget class="QTabWidget" name="tabWidget">
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="tab">
         <attribute name="title">
@@ -137,6 +137,12 @@
         <layout class="QVBoxLayout" name="verticalLayout_3">
          <item>
           <layout class="QGridLayout" name="gridLayout">
+           <item row="1" column="0" colspan="2">
+            <widget class="QLineEdit" name="lineEdTagFc"/>
+           </item>
+           <item row="1" column="2">
+            <widget class="QLineEdit" name="lineEdTitleFc"/>
+           </item>
            <item row="3" column="0" colspan="3">
             <widget class="QPlainTextEdit" name="plainTextEdContentFc"/>
            </item>
@@ -147,22 +153,12 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="labelTitleFc">
-             <property name="text">
-              <string>Title</string>
-             </property>
-            </widget>
-           </item>
            <item row="2" column="0">
             <widget class="QLabel" name="labelContentFc">
              <property name="text">
               <string>Content</string>
              </property>
             </widget>
-           </item>
-           <item row="1" column="0" colspan="3">
-            <widget class="QLineEdit" name="lineEdTitleFc"/>
            </item>
            <item row="4" column="0" colspan="2">
             <spacer name="horizontalSpacer">
@@ -176,6 +172,20 @@
               </size>
              </property>
             </spacer>
+           </item>
+           <item row="0" column="2">
+            <widget class="QLabel" name="labelTitleFc">
+             <property name="text">
+              <string>Title</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="labelTag">
+             <property name="text">
+              <string>Tag</string>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
